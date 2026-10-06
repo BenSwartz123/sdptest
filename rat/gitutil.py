@@ -110,7 +110,9 @@ def detect_repo_root(extract_dir):
         if _looks_bare(cand):
             return cand, cand
     raise GitError(
-        "no git repository found in the uploaded zip (expected a .git directory or a bare repository)"
+        "no git repository found in the uploaded zip (expected a .git directory or a bare "
+        "repository); note: GitHub's 'Download ZIP' export contains no history - clone the "
+        "repository by URL instead, or zip a local clone that includes its .git folder"
     )
 
 
