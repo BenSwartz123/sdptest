@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{ repo.name }} · importing{% endblock %}
+{% block body %}
+<section class="card status-card" id="status-card"
+         data-status-url="{{ url_for('repo_status_json', repo_id=repo.id) }}"
+         data-overview-url="{{ url_for('overview', repo_id=repo.id) }}"
+         data-status="{{ repo.status }}">
+  <h1>{{ repo.name }}</h1>
+  <p class="hint">{{ 'URL' if repo.source_type == 'url' else 'Zip' }}: <span class="mono">{{ repo.source }}</span></p>
+
+  {% if repo.status == 'error' %}
+  <div class="flash error"><b>Import failed.</b> {{ repo.stage }}</div>
+  <div class="row">
+    <form method="post" action="{{ url_for('reindex_repo', repo_id=repo.id) }}">
+      <button class="btn" type="submit">Retry indexing</button>
+    </form>
+    <a class="btn ghost" href="{{ url_for('index') }}">Back to repositories</a>
+    <form method="post" action="{{ url_for('delete_repo', repo_id=repo.id) }}"
+          onsubmit="return confirm('Delete this repository?')">
+      <button class="btn danger" type="submit">Delete</button>
+    </form>
+  </div>
+  {% else %}
+  <p id="status-stage" class="stage">{{ repo.stage or 'Starting…' }}</p>
+  <div class="progress"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  <p class="hint" id="progress-text">0 / 0 commits</p>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}{{ repo.name }} · commits{% endblock %}
+{% block body %}
+{% include '_filters.html' %}
+
+<div class="page-head">
+  <h1>Commits</h1>
+  <span class="hint">{{ total|num }} non-merge commits reachable from {{ current_ref }} match the filter</span>
+</div>
+
+{% if sel_info %}
+<p class="flash info">Your manual commit set is active ({{ sel_info.count }} commits).
+  <a href="{{ request.path }}?{{ q(over={'sel': ''}) }}">Clear it and use all commits</a></p>
+{% endif %}
+
+<form class="toolbar" method="get" action="{{ request.path }}">
+  <input type="hidden" name="ref" value="{{ current_ref }}">
+  <input type="hidden" name="sel" value="{{ request.args.get('sel', '') }}">
+  <input type="search" name="search" value="{{ search }}" placeholder="Search hash or subject…">
+  <button class="btn" type="submit">Search</button>
+  {% if search %}<a class="btn ghost" href="{{ request.path }}?{{ q(over={'search': ''}) }}">Clear search</a>{% endif %}
+</form>
+
+<form method="post" action="{{ url_for('commits_select', repo_id=repo.id) }}">
+  <input type="hidden" name="next" value="{{ request.full_path }}">
+  <input type="hidden" name="search" value="{{ search }}">
+  <div class="toolbar">
+    <button class="btn" type="submit" name="select_all" value="1">Use all {{ total|num }} filtered commits as the set</button>
+    <button class="btn" type="submit">Apply checked commits</button>
+    <button class="btn ghost" type="submit" name="clear" value="1">Clear manual set</button>
+    <span class="hint">Selection applies across the whole dashboard as the commit set H.</span>
+  </div>
+
+  <section class="card">
+  <table class="tbl">
+    <thead>
+      <tr>
+        <th><input type="checkbox" data-check-all="commit" title="Select all on this page"></th>
+        <th>Commit</th><th>Date</th><th>Author</th><th>Subject</th>
+        <th class="n">+</th><th class="n">−</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in rows %}
+      <tr>
+        <td><input type="checkbox" name="commit" value="{{ c.hash }}" {% if sel_info and c.id in f.manual_ids %}checked{% endif %}></td>
+        <td class="mono"><span title="{{ c.hash }}">{{ c.hash[:10] }}</span></td>
+        <td class="hint">{{ c.ts|dt }}</td>
+        <td>{{ c.author }}</td>
+        <td>{{ c.subject }}</td>
+        <td class="n pos">+{{ c.add_lines|num }}</td>
+        <td class="n neg">−{{ c.del_lines|num }}</td>
+      </tr>
+      {% endfor %}
+      {% if not rows %}<tr><td colspan="7" class="empty">No commits match.</td></tr>{% endif %}
+    </tbody>
+  </table>
+  </section>
+</form>
+
+{% if pages > 1 %}
+<nav class="pager">
+  {% if page > 1 %}<a class="btn ghost" href="{{ request.path }}?{{ q(over={'page': page - 1}) }}">‹ Previous</a>{% endif %}
+  <span class="hint">Page {{ page }} of {{ pages }}</span>
+  {% if page < pages %}<a class="btn ghost" href="{{ request.path }}?{{ q(over={'page': page + 1}) }}">Next ›</a>{% endif %}
+</nav>
+{% endif %}
+{% endblock %}

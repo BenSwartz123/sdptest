@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Error {{ code }}{% endblock %}
+{% block body %}
+<section class="card status-card">
+  <h1>{{ code }}</h1>
+  <p>{{ message }}</p>
+  <a class="btn" href="{{ url_for('index') }}">Back to repositories</a>
+</section>
+{% endblock %}

@@ -1,0 +1,11 @@
+# Runtime data (indexed databases and cloned/extracted repositories)
+data/
+# Local scratch
+.scratch/
+# Assessment materials (must not be published)
+*.pdf
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/

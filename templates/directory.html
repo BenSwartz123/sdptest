@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}{{ repo.name }} · {{ 'file' if is_file else 'directory' }} {{ sub or '/' }}{% endblock %}
+{% block body %}
+{% include '_filters.html' %}
+
+{% if is_file %}
+<div class="page-head">
+  <nav class="crumbs">
+    <a href="{{ url_for('directory', repo_id=repo.id) }}?{{ q() }}">root</a>
+    {% if parent %}<span>/</span><a href="{{ url_for('directory', repo_id=repo.id, sub=parent) }}?{{ q() }}">{{ parent }}</a>{% endif %}
+  </nav>
+  <h1 class="mono">{{ sub }}</h1>
+  <span class="badge">file</span>
+</div>
+{% else %}
+<div class="page-head">
+  <nav class="crumbs">
+    <a href="{{ url_for('directory', repo_id=repo.id) }}?{{ q() }}">root</a>
+    {% for c in crumbs %}<span>/</span><a href="{{ url_for('directory', repo_id=repo.id, sub=c.path) }}?{{ q() }}">{{ c.name }}</a>{% endfor %}
+  </nav>
+  <h1 class="mono">{{ sub or '/' }}</h1>
+  <span class="badge">directory{% if not sub %} · repository root{% endif %}</span>
+  {% if not sub %}<span class="hint">Directory metrics of the root are the repository metrics.</span>{% endif %}
+</div>
+{% endif %}
+
+<section class="cards">
+  <div class="stat"><span class="k">Added lines</span><span class="v pos">+{{ totals.add|num }}</span></div>
+  <div class="stat"><span class="k">Removed lines</span><span class="v neg">−{{ totals.rem|num }}</span></div>
+  <div class="stat"><span class="k">Growth</span><span class="v {{ 'pos' if totals.growth >= 0 else 'neg' }}">{{ totals.growth|num }}</span></div>
+  <div class="stat"><span class="k">Churn</span><span class="v">{{ totals.churn|num }}</span></div>
+  <div class="stat"><span class="k">Modifications</span><span class="v">{{ totals.mods|num }}</span></div>
+  <div class="stat"><span class="k">Mod frequency</span><span class="v">{{ totals.freq|round(3) }}</span></div>
+  <div class="stat"><span class="k">Churn rate</span><span class="v">{{ totals.churn_rate|round(1) }}</span></div>
+</section>
+
+<section class="charts">
+  <div class="card chart-wide">
+    <h2>Activity per week <span class="hint">for this {{ 'file' if is_file else 'directory' }}</span></h2>
+    <div class="chart" id="chart-activity" data-points='{{ series|tojson }}'></div>
+  </div>
+  <div class="card">
+    <h2>Author ownership <span class="hint">share of churn</span></h2>
+    <div class="chart" id="chart-authors" data-rows='{{ obj_authors|tojson }}'></div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Author metrics <span class="hint">n<sub>H,o,a</sub>, λ<sub>H,o,a</sub> and ownership ω<sub>H,o,a</sub></span></h2>
+  <table class="tbl">
+    <thead><tr><th>Author</th><th class="n">Touched commits</th><th class="n">Modifications</th><th class="n">Added</th><th class="n">Removed</th><th class="n">Churn</th><th class="n">Ownership</th></tr></thead>
+    <tbody>
+      {% for a in obj_authors %}
+      <tr>
+        <td>{{ a.name }} <span class="hint mono">{{ a.email }}</span></td>
+        <td class="n">{{ a.touched|num }}</td>
+        <td class="n">{{ a.mods|num }}</td>
+        <td class="n pos">+{{ a.add|num }}</td>
+        <td class="n neg">−{{ a.rem|num }}</td>
+        <td class="n">{{ a.churn|num }}</td>
+        <td class="n">{{ a.ownership|pct }}</td>
+      </tr>
+      {% endfor %}
+      {% if not obj_authors %}<tr><td colspan="7" class="empty">No changes to this object in the commit set.</td></tr>{% endif %}
+    </tbody>
+  </table>
+</section>
+
+{% if not is_file %}
+<div class="grid">
+  <section class="card">
+    <h2>Subdirectories</h2>
+    <table class="tbl">
+      <thead><tr><th>Directory</th><th class="n">Added</th><th class="n">Removed</th><th class="n">Growth</th><th class="n">Churn</th><th class="n">Mods</th></tr></thead>
+      <tbody>
+        {% for d in subdirs %}
+        <tr>
+          <td><a class="mono" href="{{ url_for('directory', repo_id=repo.id, sub=d.path) }}?{{ q() }}">{{ d.name }}/</a></td>
+          <td class="n pos">+{{ d.add|num }}</td>
+          <td class="n neg">−{{ d.rem|num }}</td>
+          <td class="n">{{ d.growth|num }}</td>
+          <td class="n">{{ d.churn|num }}</td>
+          <td class="n">{{ d.mods|num }}</td>
+        </tr>
+        {% endfor %}
+        {% if not subdirs %}<tr><td colspan="6" class="empty">No subdirectories with changes.</td></tr>{% endif %}
+      </tbody>
+    </table>
+  </section>
+  <section class="card">
+    <h2>Files</h2>
+    <table class="tbl">
+      <thead><tr><th>File</th><th class="n">Added</th><th class="n">Removed</th><th class="n">Growth</th><th class="n">Churn</th><th class="n">Mods</th></tr></thead>
+      <tbody>
+        {% for f2 in dir_files %}
+        <tr>
+          <td><a class="mono" href="{{ url_for('file_detail', repo_id=repo.id, sub=f2.path) }}?{{ q() }}">{{ f2.name }}</a></td>
+          <td class="n pos">+{{ f2.add|num }}</td>
+          <td class="n neg">−{{ f2.rem|num }}</td>
+          <td class="n">{{ f2.growth|num }}</td>
+          <td class="n">{{ f2.churn|num }}</td>
+          <td class="n">{{ f2.mods|num }}</td>
+        </tr>
+        {% endfor %}
+        {% if not dir_files %}<tr><td colspan="6" class="empty">No files with changes directly here.</td></tr>{% endif %}
+      </tbody>
+    </table>
+  </section>
+</div>
+{% endif %}
+{% endblock %}

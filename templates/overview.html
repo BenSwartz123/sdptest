@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}{{ repo.name }} · overview{% endblock %}
+{% block body %}
+{% include '_filters.html' %}
+
+<div class="page-head">
+  <h1>{{ repo.name }}</h1>
+  <span class="badge ready">ready</span>
+  <span class="hint">{{ 'URL' if repo.source_type == 'url' else 'Zip' }}: <span class="mono">{{ repo.source }}</span></span>
+  <a class="btn ghost small" href="{{ url_for('files_csv', repo_id=repo.id) }}?{{ q() }}">Export CSV</a>
+</div>
+
+<section class="cards">
+  <div class="stat"><span class="k">Commits in set</span><span class="v">{{ size|num }}</span></div>
+  <div class="stat"><span class="k">Files touched</span><span class="v">{{ total_files|num }}</span></div>
+  <div class="stat"><span class="k">Authors in set</span><span class="v">{{ author_count|num if not author_filter else 1 }}</span></div>
+  <div class="stat"><span class="k">Added lines</span><span class="v pos">+{{ totals.add|num }}</span></div>
+  <div class="stat"><span class="k">Removed lines</span><span class="v neg">−{{ totals.rem|num }}</span></div>
+  <div class="stat"><span class="k">Net growth</span><span class="v {{ 'pos' if totals.growth >= 0 else 'neg' }}">{{ totals.growth|num }}</span></div>
+  <div class="stat"><span class="k">Churn</span><span class="v">{{ totals.churn|num }}</span></div>
+  <div class="stat"><span class="k">Churn / commit</span><span class="v">{{ (totals.churn_rate)|round(1) }}</span></div>
+</section>
+
+<section class="charts">
+  <div class="card chart-wide">
+    <h2>Activity per week <span class="hint">churn, growth and commits over the commit set</span></h2>
+    <div class="chart" id="chart-activity"
+         data-points='{{ series|tojson }}'></div>
+  </div>
+  <div class="card">
+    <h2>Top authors <span class="hint">share of churn</span></h2>
+    <div class="chart" id="chart-authors"
+         data-rows='{{ author_rows|tojson }}' data-total="{{ totals.churn }}"></div>
+  </div>
+</section>
+
+<section class="charts">
+  <div class="card chart-wide">
+    <h2>Most changed files <span class="hint">by churn</span></h2>
+    <div class="chart" id="chart-topfiles" data-rows='{{ top_files|tojson }}'
+         data-base="{{ url_for('file_detail', repo_id=repo.id, sub='__PATH__') }}"></div>
+  </div>
+</section>
+
+<div class="grid stack">
+  <section class="card">
+    <h2>Top files</h2>
+    <table class="tbl">
+      <thead><tr><th>Path</th><th class="n">Added</th><th class="n">Removed</th><th class="n">Growth</th><th class="n">Churn</th><th class="n">Mods</th></tr></thead>
+      <tbody>
+        {% for r in top_files %}
+        <tr>
+          <td><a class="mono" href="{{ url_for('file_detail', repo_id=repo.id, sub=r.path) }}?{{ q() }}">{{ r.path }}</a></td>
+          <td class="n pos">+{{ r.addl|num }}</td>
+          <td class="n neg">−{{ r.dell|num }}</td>
+          <td class="n">{{ (r.addl - r.dell)|num }}</td>
+          <td class="n">{{ (r.addl + r.dell)|num }}</td>
+          <td class="n">{{ r.mods|num }}</td>
+        </tr>
+        {% endfor %}
+        {% if not top_files %}<tr><td colspan="6" class="empty">No changes in this commit set.</td></tr>{% endif %}
+      </tbody>
+    </table>
+  </section>
+  <section class="card">
+    <h2>Authors <span class="hint">over the commit set</span></h2>
+    <table class="tbl">
+      <thead><tr><th>Author</th><th class="n">Commits</th><th class="n">Churn</th><th class="n">Ownership</th></tr></thead>
+      <tbody>
+        {% for a in author_rows %}
+        <tr>
+          <td><a href="{{ url_for('authors', repo_id=repo.id) }}?{{ q(over={'author': a.aid}) }}">{{ a.name }}</a>
+              <span class="hint mono">{{ a.email }}</span></td>
+          <td class="n">{{ a.commits|num }}</td>
+          <td class="n">{{ a.churn|num }}</td>
+          <td class="n">{{ a.ownership|pct }}</td>
+        </tr>
+        {% endfor %}
+        {% if not author_rows %}<tr><td colspan="4" class="empty">No commits in this set.</td></tr>{% endif %}
+      </tbody>
+    </table>
+  </section>
+</div>
+{% endblock %}

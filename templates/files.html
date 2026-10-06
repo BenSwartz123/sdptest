@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}{{ repo.name }} · files{% endblock %}
+{% block body %}
+{% include '_filters.html' %}
+
+<div class="page-head">
+  <h1>File metrics</h1>
+  <span class="hint">per-file metrics over the commit set ({{ total|num }} files with changes)</span>
+  <a class="btn ghost small" href="{{ url_for('files_csv', repo_id=repo.id) }}?{{ q(over={'page': ''}) }}">Export CSV</a>
+</div>
+
+<form class="toolbar" method="get" action="{{ request.path }}">
+  <input type="hidden" name="sel" value="{{ request.args.get('sel', '') }}">
+  <input type="hidden" name="ref" value="{{ current_ref }}">
+  <input type="hidden" name="from" value="{{ request.args.get('from', '') }}">
+  <input type="hidden" name="to" value="{{ request.args.get('to', '') }}">
+  <input type="hidden" name="author" value="{{ author_filter or '' }}">
+  <input type="hidden" name="sort" value="{{ sort }}">
+  <input type="search" name="search" value="{{ search }}" placeholder="Filter by path…">
+  <button class="btn" type="submit">Search</button>
+  {% if search %}<a class="btn ghost" href="{{ request.path }}?{{ q(over={'search': ''}) }}">Clear search</a>{% endif %}
+</form>
+
+<section class="cards small">
+  <div class="stat"><span class="k">Totals over set</span></div>
+  <div class="stat"><span class="k">Added</span><span class="v pos">+{{ totals.add|num }}</span></div>
+  <div class="stat"><span class="k">Removed</span><span class="v neg">−{{ totals.rem|num }}</span></div>
+  <div class="stat"><span class="k">Growth</span><span class="v">{{ totals.growth|num }}</span></div>
+  <div class="stat"><span class="k">Churn</span><span class="v">{{ totals.churn|num }}</span></div>
+  <div class="stat"><span class="k">Modifications</span><span class="v">{{ totals.mods|num }}</span></div>
+</section>
+
+<section class="card">
+<table class="tbl sortable">
+  <thead>
+    <tr>
+      <th><a href="{{ request.path }}?{{ q(over={'sort': 'path', 'page': ''}) }}">Path</a></th>
+      <th class="n"><a href="{{ request.path }}?{{ q(over={'sort': 'add', 'page': ''}) }}">Added</a></th>
+      <th class="n"><a href="{{ request.path }}?{{ q(over={'sort': 'rem', 'page': ''}) }}">Removed</a></th>
+      <th class="n"><a href="{{ request.path }}?{{ q(over={'sort': 'growth', 'page': ''}) }}">Growth</a></th>
+      <th class="n"><a href="{{ request.path }}?{{ q(over={'sort': 'churn', 'page': ''}) }}">Churn</a></th>
+      <th class="n"><a href="{{ request.path }}?{{ q(over={'sort': 'mods', 'page': ''}) }}">Mods</a></th>
+      <th class="n">Mod freq</th>
+      <th class="n">Churn rate</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in rows %}
+    <tr>
+      <td><a class="mono" href="{{ url_for('file_detail', repo_id=repo.id, sub=r.path) }}?{{ q(over={'page': ''}) }}">{{ r.path }}</a></td>
+      <td class="n pos">+{{ r.addl|num }}</td>
+      <td class="n neg">−{{ r.dell|num }}</td>
+      <td class="n {{ 'pos' if r.addl - r.dell > 0 else ('neg' if r.addl - r.dell < 0 else '') }}">{{ (r.addl - r.dell)|num }}</td>
+      <td class="n">{{ (r.addl + r.dell)|num }}</td>
+      <td class="n">{{ r.mods|num }}</td>
+      <td class="n">{{ (r.mods / size if size else 0)|round(3) }}</td>
+      <td class="n">{{ ((r.addl + r.dell) / size if size else 0)|round(1) }}</td>
+    </tr>
+    {% endfor %}
+    {% if not rows %}
+    <tr><td colspan="8" class="empty">No file changes match this commit set / search.{% if search %} Try clearing the search.{% endif %}</td></tr>
+    {% endif %}
+  </tbody>
+</table>
+</section>
+
+{% if pages > 1 %}
+<nav class="pager">
+  {% if page > 1 %}<a class="btn ghost" href="{{ request.path }}?{{ q(over={'page': page - 1}) }}">‹ Previous</a>{% endif %}
+  <span class="hint">Page {{ page }} of {{ pages }}</span>
+  {% if page < pages %}<a class="btn ghost" href="{{ request.path }}?{{ q(over={'page': page + 1}) }}">Next ›</a>{% endif %}
+</nav>
+{% endif %}
+{% endblock %}

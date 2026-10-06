@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}{{ repo.name }} · authors{% endblock %}
+{% block body %}
+{% include '_filters.html' %}
+
+<div class="page-head">
+  <h1>Authors</h1>
+  <span class="hint">author metrics over the commit set; identities are merged through the repository .mailmap on import</span>
+</div>
+
+{% if author_filter %}
+<p class="flash info">Filtered to a single author everywhere on this repo ({{ author_filter }}).
+  <a href="{{ request.path }}?{{ q(over={'author': ''}) }}">Show all authors</a></p>
+{% endif %}
+
+<div class="grid">
+  <section class="card wide">
+    <h2>Author metrics</h2>
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>Author</th><th class="n">Identities</th><th class="n">Commits in set</th>
+          <th class="n">Added</th><th class="n">Removed</th><th class="n">Churn</th>
+          <th class="n">Modifications</th><th class="n">Ownership</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in all_authors %}
+        <tr>
+          <td>
+            {{ a.name }} <span class="hint mono">{{ a.email }}</span>
+            {% if a.identities > 1 %}<span class="badge" title="Identities merged into this author">merged ×{{ a.identities }}</span>{% endif %}
+          </td>
+          <td class="n">{{ a.identities }}</td>
+          <td class="n">{{ a.in_set.commits|num }}</td>
+          <td class="n pos">+{{ a.in_set.add|num }}</td>
+          <td class="n neg">−{{ a.in_set.rem|num }}</td>
+          <td class="n">{{ a.in_set.churn|num }}</td>
+          <td class="n">{{ a.in_set.mods|num }}</td>
+          <td class="n">{{ a.in_set.ownership|pct }}</td>
+          <td class="n"><a class="btn ghost small" href="{{ request.path }}?{{ q(over={'author': a.aid, 'page': ''}) }}">Filter</a></td>
+        </tr>
+        {% endfor %}
+        {% if not all_authors %}<tr><td colspan="9" class="empty">No authors.</td></tr>{% endif %}
+      </tbody>
+    </table>
+  </section>
+</div>
+
+<div class="grid">
+  <section class="card">
+    <h2>Merge authors <span class="hint">merge an identity into another (useful when there is no .mailmap)</span></h2>
+    {% if all_authors|length >= 2 %}
+    <form method="post" action="{{ url_for('merge_authors', repo_id=repo.id) }}" class="merge-form">
+      <label for="merge-from">Merge</label>
+      <select id="merge-from" name="from_id">
+        {% for a in all_authors %}<option value="{{ a.aid }}">{{ a.name }} &lt;{{ a.email }}&gt;</option>{% endfor %}
+      </select>
+      <label for="merge-to">into</label>
+      <select id="merge-to" name="to_id">
+        {% for a in all_authors %}<option value="{{ a.aid }}">{{ a.name }} &lt;{{ a.email }}&gt;</option>{% endfor %}
+      </select>
+      <button class="btn" type="submit" onclick="return confirm('Merge these authors? Metrics will be recalculated for the merged identity.')">Merge</button>
+    </form>
+    <p class="hint">Merging changes author attribution for the whole repository immediately — no re-index required.</p>
+    {% else %}
+    <p class="empty">Need at least two authors to merge.</p>
+    {% endif %}
+  </section>
+
+  <section class="card">
+    <h2>Manual merges</h2>
+    {% if merges %}
+    <table class="tbl">
+      <thead><tr><th>Merged</th><th>Into</th><th class="n">When</th><th></th></tr></thead>
+      <tbody>
+        {% for m in merges %}
+        <tr>
+          <td>{{ m.from_name }} <span class="hint mono">{{ m.from_email }}</span></td>
+          <td>{{ m.to_name }} <span class="hint mono">{{ m.to_email }}</span></td>
+          <td class="n hint">{{ m.created_at }}</td>
+          <td class="n">
+            <form method="post" action="{{ url_for('unmerge_authors', repo_id=repo.id, merge_id=m.id) }}">
+              <button class="btn ghost small" type="submit">Undo</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <form method="post" action="{{ url_for('unmerge_all', repo_id=repo.id) }}">
+      <button class="btn ghost small" type="submit">Clear all manual merges</button>
+    </form>
+    {% else %}
+    <p class="empty">No manual merges yet. (Identities merged by .mailmap on import are shown as one author above.)</p>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

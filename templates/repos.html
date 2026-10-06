@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Repositories{% endblock %}
+{% block body %}
+<h1>Repositories</h1>
+<p class="lede">Analyse Git repositories as a dashboard: upload a zip of a repository
+(including its <code>.git</code> directory) or deep-clone one from a URL. Metrics are computed
+per commit set and can be filtered by author, file/directory and reference commit.</p>
+
+<div class="grid" id="add">
+  <section class="card">
+    <h2>Clone from URL</h2>
+    <form method="post" action="{{ url_for('clone_repo') }}">
+      <input type="url" name="url" placeholder="https://github.com/DaveGamble/cJSON.git" required>
+      <button class="btn" type="submit">Clone &amp; index</button>
+    </form>
+    <p class="hint">A full (deep) mirror clone is made, so the complete history is analysed.</p>
+  </section>
+  <section class="card">
+    <h2>Upload zip</h2>
+    <form method="post" action="{{ url_for('upload_repo') }}" enctype="multipart/form-data">
+      <input type="file" name="zipfile" accept=".zip,application/zip" required>
+      <button class="btn" type="submit">Upload &amp; index</button>
+    </form>
+    <p class="hint">The archive must contain the repository's <code>.git</code> data (or be a bare repository).</p>
+  </section>
+</div>
+
+<h2 class="mt">All repositories</h2>
+{% if not repos %}
+<p class="empty">No repositories yet — add one above.</p>
+{% endif %}
+<div class="grid">
+  {% for r in repos %}
+  <section class="card repo-card">
+    <div class="row">
+      <h3><a href="{{ url_for('overview', repo_id=r.id) }}">{{ r.name }}</a></h3>
+      <span class="badge {{ r.status }}">{{ r.status }}</span>
+    </div>
+    <p class="hint">{{ 'URL' if r.source_type == 'url' else 'Zip' }}: <span class="mono">{{ r.source }}</span></p>
+    {% if r.status == 'ready' %}
+    <p class="stats">
+      <span><b>{{ r.n_commits|num }}</b> commits</span>
+      <span><b>{{ r.n_files|num }}</b> files</span>
+      <span><b>{{ r.n_authors|num }}</b> authors</span>
+    </p>
+    <div class="row">
+      <a class="btn" href="{{ url_for('overview', repo_id=r.id) }}">Open dashboard</a>
+      <form method="post" action="{{ url_for('delete_repo', repo_id=r.id) }}"
+            onsubmit="return confirm('Delete repository \'{{ r.name }}\' and all indexed data?')">
+        <button class="btn danger ghost" type="submit">Delete</button>
+      </form>
+    </div>
+    {% elif r.status == 'error' %}
+    <p class="error-text">{{ r.stage }}</p>
+    <div class="row">
+      <a class="btn ghost" href="{{ url_for('repo_status', repo_id=r.id) }}">Details</a>
+      <form method="post" action="{{ url_for('delete_repo', repo_id=r.id) }}">
+        <button class="btn danger ghost" type="submit">Delete</button>
+      </form>
+    </div>
+    {% else %}
+    <p class="hint">{{ r.stage or 'Waiting…' }}</p>
+    <a class="btn ghost" href="{{ url_for('repo_status', repo_id=r.id) }}">View progress</a>
+    {% endif %}
+  </section>
+  {% endfor %}
+</div>
+{% endblock %}

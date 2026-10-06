@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Repositories{% endblock %} · RAT</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <a href="{{ url_for('index') }}">RAT</a>
+    <span class="sub">Repository Analysis Tool</span>
+  </div>
+  <nav class="topnav">
+    {% if repos %}
+    <label class="sr-only" for="repo-switch">Repository</label>
+    <select id="repo-switch" onchange="if(this.value) location.href=this.value">
+      <option value="{{ url_for('index') }}">All repositories…</option>
+      {% for r in repos %}
+      <option value="{{ url_for('overview', repo_id=r.id) }}" {% if repo and r.id == repo.id %}selected{% endif %}>{{ r.name }}</option>
+      {% endfor %}
+    </select>
+    {% endif %}
+    <a class="btn ghost" href="{{ url_for('index') }}#add">+ Add repository</a>
+  </nav>
+</header>
+
+{% if repo and repo.status == 'ready' %}
+<nav class="subnav">
+  <a class="{{ 'active' if request.endpoint == 'overview' }}" href="{{ url_for('overview', repo_id=repo.id) }}?{{ q() }}">Overview</a>
+  <a class="{{ 'active' if request.endpoint == 'files' }}" href="{{ url_for('files', repo_id=repo.id) }}?{{ q() }}">Files</a>
+  <a class="{{ 'active' if request.endpoint in ('directory', 'file_detail') }}" href="{{ url_for('directory', repo_id=repo.id) }}?{{ q() }}">Directories</a>
+  <a class="{{ 'active' if request.endpoint == 'commits' }}" href="{{ url_for('commits', repo_id=repo.id) }}?{{ q() }}">Commits</a>
+  <a class="{{ 'active' if request.endpoint == 'authors' }}" href="{{ url_for('authors', repo_id=repo.id) }}?{{ q() }}">Authors</a>
+</nav>
+{% endif %}
+
+<main>
+{% for cat, msg in get_flashed_messages(with_categories=true) %}
+<div class="flash {{ cat }}">{{ msg }}</div>
+{% endfor %}
+{% if notes %}
+<div class="notes">
+  {% for n in notes %}<div class="flash warn">{{ n }}</div>{% endfor %}
+</div>
+{% endif %}
+{% block body %}{% endblock %}
+</main>
+
+<footer>
+  Metrics follow the COMS3011A definitions: line counts come from git's own diff
+  (rename detection at 50%, binary files excluded, non-merge commits only).
+</footer>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

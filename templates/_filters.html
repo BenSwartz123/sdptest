@@ -1,0 +1,47 @@
+<form class="filterbar" method="get" action="{{ request.path }}">
+  <input type="hidden" name="sel" value="{{ request.args.get('sel', '') }}">
+  <input type="hidden" name="search" value="{{ request.args.get('search', '') }}">
+  <input type="hidden" name="sort" value="{{ request.args.get('sort', '') }}">
+
+  <div class="fgroup">
+    <label for="flt-ref">Reference</label>
+    <input id="flt-ref" name="ref" list="ref-list" value="{{ current_ref }}" spellcheck="false" autocomplete="off">
+    <datalist id="ref-list">
+      {% for r in refs %}<option value="{{ r }}"></option>{% endfor %}
+    </datalist>
+  </div>
+
+  <div class="fgroup">
+    <label for="flt-from">From</label>
+    <input id="flt-from" type="datetime-local" name="from" value="{{ request.args.get('from', '') }}">
+    <label for="flt-to">To <span class="hint">(exclusive)</span></label>
+    <input id="flt-to" type="datetime-local" name="to" value="{{ request.args.get('to', '') }}">
+  </div>
+
+  <div class="fgroup">
+    <label for="flt-author">Author</label>
+    <select id="flt-author" name="author">
+      <option value="">All authors</option>
+      {% for a in authors_list %}
+      <option value="{{ a.aid }}" {% if author_filter == a.aid %}selected{% endif %}>{{ a.name }} &lt;{{ a.email }}&gt; ({{ a.commits }})</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="fgroup grow">
+    <button class="btn" type="submit">Apply</button>
+    <a class="btn ghost" href="{{ request.path }}?{{ q(over={'from': '', 'to': '', 'sel': '', 'author': ''}) }}">Clear</a>
+    {% for label, ts in quick_ranges %}
+    <a class="btn ghost small" href="{{ request.path }}?{{ q(over={'from': ts|dti, 'to': '', 'sel': ''}) }}">{{ label }}</a>
+    {% endfor %}
+  </div>
+</form>
+
+<div class="setbar">
+  <span class="chip">Commit set: {{ f.describe() }}</span>
+  <span class="chip">|H| = <b>{{ size|num }}</b> commits</span>
+  {% if f.mode == 'manual' %}
+  <span class="chip accent">Manual selection active ({{ f.manual_ids|length }} commits)
+    <a href="{{ url_for('commits', repo_id=repo.id) }}?{{ q(over={'sel': ''}) }}">edit</a></span>
+  {% endif %}
+</div>
