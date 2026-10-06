@@ -19,8 +19,8 @@ no external assets, and all storage is SQLite from the standard library.
 ## Quick start (fresh clone)
 
 ```bash
-git clone <this-repo-url>
-cd sdptest
+git clone https://github.com/BenSwartz123/sdptest-2434490.git
+cd sdptest-2434490
 python3 -m pip install -r requirements.txt   # installs Flask
 python3 app.py
 ```
