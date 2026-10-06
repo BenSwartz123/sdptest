@@ -236,6 +236,17 @@
   /* Boot                                                                */
   /* ------------------------------------------------------------------ */
   document.addEventListener("DOMContentLoaded", function () {
+    // Explain-on-hover controls (.tip labels/cards and help chips) show their
+    // text instantly: move it from title into data-tip, which the stylesheet
+    // renders as a CSS tooltip (native title tooltips are slow or suppressed
+    // in some browsers). aria-label keeps screen-reader access.
+    document.querySelectorAll(".tip[title], a.chip[title]").forEach(function (node) {
+      var text = node.getAttribute("title");
+      node.setAttribute("data-tip", text);
+      node.setAttribute("aria-label", text);
+      node.removeAttribute("title");
+    });
+
     var activity = document.getElementById("chart-activity");
     if (activity) lineChart(activity, parseJSON(activity, "data-points", []));
 

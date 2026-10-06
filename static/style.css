@@ -216,6 +216,31 @@ section.charts .card { margin-bottom: 0; }
 /* usability: hover hints (title attribute) and help page bits */
 .tip { border-bottom: 1px dotted #b6c0d4; cursor: help; }
 .tip:hover { border-bottom-color: var(--accent); }
+/* Instant CSS tooltips: app.js moves each title into data-tip, because
+   native title tooltips are slow or suppressed in some browsers. */
+.tip[data-tip], a.chip[data-tip] { position: relative; }
+.tip[data-tip]:hover::after, a.chip[data-tip]:hover::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: 0; bottom: calc(100% + 7px);
+  z-index: 300;
+  width: max-content;
+  max-width: 330px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  background: #1f2937;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  line-height: 1.45;
+  text-align: left;
+  white-space: normal;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, .25);
+  pointer-events: none;
+}
+a.chip[data-tip]:hover::after { left: auto; right: 0; }
 ul.tips { padding-left: 18px; margin: 6px 0 0; }
 ul.tips li { margin: 4px 0; }
 a.chip { color: #33415c; }
