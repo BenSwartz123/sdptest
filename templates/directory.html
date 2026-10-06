@@ -25,13 +25,13 @@
 {% endif %}
 
 <section class="cards">
-  <div class="stat"><span class="k">Added lines</span><span class="v pos">+{{ totals.add|num }}</span></div>
-  <div class="stat"><span class="k">Removed lines</span><span class="v neg">−{{ totals.rem|num }}</span></div>
-  <div class="stat"><span class="k">Growth</span><span class="v {{ 'pos' if totals.growth >= 0 else 'neg' }}">{{ totals.growth|num }}</span></div>
-  <div class="stat"><span class="k">Churn</span><span class="v">{{ totals.churn|num }}</span></div>
-  <div class="stat"><span class="k">Modifications</span><span class="v">{{ totals.mods|num }}</span></div>
-  <div class="stat"><span class="k">Mod frequency</span><span class="v">{{ totals.freq|round(3) }}</span></div>
-  <div class="stat"><span class="k">Churn rate</span><span class="v">{{ totals.churn_rate|round(1) }}</span></div>
+  <div class="stat"><span class="k tip" title="Lines added here, as counted by git. Binary files are excluded.">Added lines</span><span class="v pos">+{{ totals.add|num }}</span></div>
+  <div class="stat"><span class="k tip" title="Lines removed here, as counted by git.">Removed lines</span><span class="v neg">−{{ totals.rem|num }}</span></div>
+  <div class="stat"><span class="k tip" title="Added minus removed. Positive means this part of the project grew.">Growth</span><span class="v {{ 'pos' if totals.growth >= 0 else 'neg' }}">{{ totals.growth|num }}</span></div>
+  <div class="stat"><span class="k tip" title="Added plus removed: how much code was touched in total.">Churn</span><span class="v">{{ totals.churn|num }}</span></div>
+  <div class="stat"><span class="k tip" title="How many commits changed this file or directory (a pure rename doesn't count).">Modifications</span><span class="v">{{ totals.mods|num }}</span></div>
+  <div class="stat"><span class="k tip" title="Modifications divided by the number of commits in the set - how often it changes.">Mod frequency</span><span class="v">{{ totals.freq|round(3) }}</span></div>
+  <div class="stat"><span class="k tip" title="Churn divided by the number of commits in the set - average change per commit.">Churn rate</span><span class="v">{{ totals.churn_rate|round(1) }}</span></div>
 </section>
 
 <section class="charts">
@@ -46,9 +46,9 @@
 </section>
 
 <section class="card">
-  <h2>Author metrics <span class="hint">n<sub>H,o,a</sub>, λ<sub>H,o,a</sub> and ownership ω<sub>H,o,a</sub></span></h2>
+  <h2>Author metrics <span class="hint">how each person contributed to this {{ 'file' if is_file else 'directory' }} (n<sub>H,o,a</sub>, λ<sub>H,o,a</sub>, ω<sub>H,o,a</sub>)</span></h2>
   <table class="tbl">
-    <thead><tr><th>Author</th><th class="n">Touched commits</th><th class="n">Modifications</th><th class="n">Added</th><th class="n">Removed</th><th class="n">Churn</th><th class="n">Ownership</th></tr></thead>
+    <thead><tr><th title="Who changed this file/directory.">Author</th><th class="n" title="Commits in the set that touched this file/directory.">Touched commits</th><th class="n" title="Times this person changed lines here.">Modifications</th><th class="n" title="Lines this person added (+).">Added</th><th class="n" title="Lines this person removed (−).">Removed</th><th class="n" title="Added + removed by this person here.">Churn</th><th class="n" title="This person's share of all changed lines in this file/directory.">Ownership</th></tr></thead>
     <tbody>
       {% for a in obj_authors %}
       <tr>
@@ -69,9 +69,9 @@
 {% if not is_file %}
 <div class="grid">
   <section class="card">
-    <h2>Subdirectories</h2>
+    <h2>Subdirectories <span class="hint">each folder's numbers include everything inside it</span></h2>
     <table class="tbl">
-      <thead><tr><th>Directory</th><th class="n">Added</th><th class="n">Removed</th><th class="n">Growth</th><th class="n">Churn</th><th class="n">Mods</th></tr></thead>
+      <thead><tr><th title="Click a folder to open it. Its totals include every file inside, at any depth.">Directory</th><th class="n" title="Lines added inside this folder.">Added</th><th class="n" title="Lines removed inside this folder.">Removed</th><th class="n" title="Added − removed.">Growth</th><th class="n" title="Added + removed: total amount of change.">Churn</th><th class="n" title="How many commits changed something inside this folder.">Mods</th></tr></thead>
       <tbody>
         {% for d in subdirs %}
         <tr>
@@ -88,9 +88,9 @@
     </table>
   </section>
   <section class="card">
-    <h2>Files</h2>
+    <h2>Files <span class="hint">only the files directly in this folder</span></h2>
     <table class="tbl">
-      <thead><tr><th>File</th><th class="n">Added</th><th class="n">Removed</th><th class="n">Growth</th><th class="n">Churn</th><th class="n">Mods</th></tr></thead>
+      <thead><tr><th title="Click a file to see its own page. Deeper files live in the subdirectories above.">File</th><th class="n" title="Lines added to this file.">Added</th><th class="n" title="Lines removed from this file.">Removed</th><th class="n" title="Added − removed.">Growth</th><th class="n" title="Added + removed: total amount of change.">Churn</th><th class="n" title="How many commits changed this file.">Mods</th></tr></thead>
       <tbody>
         {% for f2 in dir_files %}
         <tr>

@@ -5,7 +5,7 @@
 
 <div class="page-head">
   <h1>Commits</h1>
-  <span class="hint">{{ total|num }} non-merge commits reachable from {{ current_ref }} match the filter</span>
+  <span class="hint" title="Merge commits are excluded because they don't add changes of their own.">{{ total|num }} non-merge commits reachable from {{ current_ref }} match the filter</span>
 </div>
 
 {% if sel_info %}
@@ -25,19 +25,22 @@
   <input type="hidden" name="next" value="{{ request.full_path }}">
   <input type="hidden" name="search" value="{{ search }}">
   <div class="toolbar">
-    <button class="btn" type="submit" name="select_all" value="1">Use all {{ total|num }} filtered commits as the set</button>
-    <button class="btn" type="submit">Apply checked commits</button>
-    <button class="btn ghost" type="submit" name="clear" value="1">Clear manual set</button>
-    <span class="hint">Selection applies across the whole dashboard as the commit set H.</span>
+    <button class="btn" type="submit" name="select_all" value="1" title="Makes every commit matching the current filter - not just this page - the commit set.">Use all {{ total|num }} filtered commits as the set</button>
+    <button class="btn" type="submit" title="Uses the commits you ticked above as the commit set.">Apply checked commits</button>
+    <button class="btn ghost" type="submit" name="clear" value="1" title="Go back to counting all history.">Clear manual set</button>
+    <span class="hint">Whatever you choose here becomes the <b>commit set</b> that every tab counts - shown in the chips at the top of each page.</span>
   </div>
 
   <section class="card">
   <table class="tbl">
     <thead>
       <tr>
-        <th><input type="checkbox" data-check-all="commit" title="Select all on this page"></th>
-        <th>Commit</th><th>Date</th><th>Author</th><th>Subject</th>
-        <th class="n">+</th><th class="n">−</th>
+        <th><input type="checkbox" data-check-all="commit" title="Tick the commits you want, then press 'Apply checked commits' to build a custom set."></th>
+        <th title="Short version of the commit's unique id; hover a hash to see the full id.">Commit</th>
+        <th title="When the commit was made (UTC).">Date</th>
+        <th title="Who made the commit.">Author</th>
+        <th title="First line of the commit message.">Subject</th>
+        <th class="n" title="Lines added by this commit.">+</th><th class="n" title="Lines removed by this commit.">−</th>
       </tr>
     </thead>
     <tbody>

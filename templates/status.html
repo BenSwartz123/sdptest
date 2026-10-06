@@ -20,10 +20,21 @@
       <button class="btn danger" type="submit">Delete</button>
     </form>
   </div>
+  <h2 class="mt">What can I try?</h2>
+  <ul class="hint tips">
+    <li><b>Uploaded a zip?</b> It must contain the repository's hidden <code>.git</code> folder.
+        GitHub's green <i>Download ZIP</i> button does <b>not</b> include the history - clone the
+        repository and zip the clone instead.</li>
+    <li><b>Cloning by URL?</b> Only <b>public</b> repositories work (the tool never logs in), and the
+        address must be complete - e.g. <code>https://github.com/user/project.git</code>.</li>
+    <li>Full explanations are on the <a href="{{ url_for('help_page') }}#fix">Help page</a>.</li>
+  </ul>
   {% else %}
   <p id="status-stage" class="stage">{{ repo.stage or 'Starting…' }}</p>
   <div class="progress"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
   <p class="hint" id="progress-text">0 / 0 commits</p>
+  <p class="hint">This runs in the background - you can leave the page open (it updates on its own)
+     or come back later; large repositories simply take a few minutes.</p>
   {% endif %}
 </section>
 {% endblock %}

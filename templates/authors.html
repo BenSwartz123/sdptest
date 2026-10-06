@@ -19,9 +19,11 @@
     <table class="tbl">
       <thead>
         <tr>
-          <th>Author</th><th class="n">Identities</th><th class="n">Commits in set</th>
-          <th class="n">Added</th><th class="n">Removed</th><th class="n">Churn</th>
-          <th class="n">Modifications</th><th class="n">Ownership</th><th></th>
+          <th title="People who committed; Git knows them by name + email, and duplicates are merged.">Author</th>
+          <th class="n" title="How many name/email pairs were merged into this person (.mailmap or manual merge).">Identities</th>
+          <th class="n" title="How many of this person's commits are inside the current commit set.">Commits in set</th>
+          <th class="n" title="Lines added by this person (+).">Added</th><th class="n" title="Lines removed (−).">Removed</th><th class="n" title="Added + removed by this person.">Churn</th>
+          <th class="n" title="Commits by this person that changed at least one line (pure renames don't count).">Modifications</th><th class="n" title="This person's share of all changed lines in the set.">Ownership</th><th></th>
         </tr>
       </thead>
       <tbody>
@@ -38,7 +40,7 @@
           <td class="n">{{ a.in_set.churn|num }}</td>
           <td class="n">{{ a.in_set.mods|num }}</td>
           <td class="n">{{ a.in_set.ownership|pct }}</td>
-          <td class="n"><a class="btn ghost small" href="{{ request.path }}?{{ q(over={'author': a.aid, 'page': ''}) }}">Filter</a></td>
+          <td class="n"><a class="btn ghost small" href="{{ request.path }}?{{ q(over={'author': a.aid, 'page': ''}) }}" title="Show this person's commits on every tab.">Filter</a></td>
         </tr>
         {% endfor %}
         {% if not all_authors %}<tr><td colspan="9" class="empty">No authors.</td></tr>{% endif %}
@@ -49,7 +51,7 @@
 
 <div class="grid">
   <section class="card">
-    <h2>Merge authors <span class="hint">merge an identity into another (useful when there is no .mailmap)</span></h2>
+    <h2>Merge authors <span class="hint">combine two names/emails that belong to the same person</span></h2>
     {% if all_authors|length >= 2 %}
     <form method="post" action="{{ url_for('merge_authors', repo_id=repo.id) }}" class="merge-form">
       <label for="merge-from">Merge</label>

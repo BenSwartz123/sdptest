@@ -11,14 +11,14 @@
 </div>
 
 <section class="cards">
-  <div class="stat"><span class="k">Commits in set</span><span class="v">{{ size|num }}</span></div>
-  <div class="stat"><span class="k">Files touched</span><span class="v">{{ total_files|num }}</span></div>
-  <div class="stat"><span class="k">Authors in set</span><span class="v">{{ author_count|num if not author_filter else 1 }}</span></div>
-  <div class="stat"><span class="k">Added lines</span><span class="v pos">+{{ totals.add|num }}</span></div>
-  <div class="stat"><span class="k">Removed lines</span><span class="v neg">−{{ totals.rem|num }}</span></div>
-  <div class="stat"><span class="k">Net growth</span><span class="v {{ 'pos' if totals.growth >= 0 else 'neg' }}">{{ totals.growth|num }}</span></div>
-  <div class="stat"><span class="k">Churn</span><span class="v">{{ totals.churn|num }}</span></div>
-  <div class="stat"><span class="k">Churn / commit</span><span class="v">{{ (totals.churn_rate)|round(1) }}</span></div>
+  <div class="stat"><span class="k tip" title="How many commits the numbers on this page are based on (the commit set H).">Commits in set</span><span class="v">{{ size|num }}</span></div>
+  <div class="stat"><span class="k tip" title="How many different files were changed by at least one commit in the set.">Files touched</span><span class="v">{{ total_files|num }}</span></div>
+  <div class="stat"><span class="k tip" title="How many people committed in the set; duplicate names/emails are merged into one author.">Authors in set</span><span class="v">{{ author_count|num if not author_filter else 1 }}</span></div>
+  <div class="stat"><span class="k tip" title="Total lines added, as counted by git. Binary files are excluded.">Added lines</span><span class="v pos">+{{ totals.add|num }}</span></div>
+  <div class="stat"><span class="k tip" title="Total lines removed, as counted by git.">Removed lines</span><span class="v neg">−{{ totals.rem|num }}</span></div>
+  <div class="stat"><span class="k tip" title="Added minus removed. Positive means the codebase grew.">Net growth</span><span class="v {{ 'pos' if totals.growth >= 0 else 'neg' }}">{{ totals.growth|num }}</span></div>
+  <div class="stat"><span class="k tip" title="Added plus removed: how much code was touched in total.">Churn</span><span class="v">{{ totals.churn|num }}</span></div>
+  <div class="stat"><span class="k tip" title="Average churn per commit in the set (total churn ÷ number of commits).">Churn / commit</span><span class="v">{{ (totals.churn_rate)|round(1) }}</span></div>
 </section>
 
 <section class="charts">
@@ -44,9 +44,9 @@
 
 <div class="grid stack">
   <section class="card">
-    <h2>Top files</h2>
+    <h2>Top files <span class="hint">click a path for the file's own page</span></h2>
     <table class="tbl">
-      <thead><tr><th>Path</th><th class="n">Added</th><th class="n">Removed</th><th class="n">Growth</th><th class="n">Churn</th><th class="n">Mods</th></tr></thead>
+      <thead><tr><th title="The most-changed files in the commit set.">Path</th><th class="n" title="Lines added by the commits in the set (+).">Added</th><th class="n" title="Lines removed (−).">Removed</th><th class="n" title="Added − removed.">Growth</th><th class="n" title="Added + removed: total amount of change.">Churn</th><th class="n" title="How many commits changed this file.">Mods</th></tr></thead>
       <tbody>
         {% for r in top_files %}
         <tr>
@@ -63,9 +63,9 @@
     </table>
   </section>
   <section class="card">
-    <h2>Authors <span class="hint">over the commit set</span></h2>
+    <h2>Authors <span class="hint">over the commit set - click a name to focus on that person</span></h2>
     <table class="tbl">
-      <thead><tr><th>Author</th><th class="n">Commits</th><th class="n">Churn</th><th class="n">Ownership</th></tr></thead>
+      <thead><tr><th title="People who committed in the set.">Author</th><th class="n" title="How many of this person's commits are in the set.">Commits</th><th class="n" title="Added + removed lines by this author.">Churn</th><th class="n" title="This author's share of all changed lines, as a percentage.">Ownership</th></tr></thead>
       <tbody>
         {% for a in author_rows %}
         <tr>

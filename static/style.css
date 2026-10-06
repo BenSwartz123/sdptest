@@ -74,6 +74,11 @@ section.charts { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margi
 section.charts .card { margin-bottom: 0; }
 @media (max-width: 980px) { section.charts { grid-template-columns: 1fr; } }
 
+/* home hero */
+.hero { padding: 22px 24px; }
+.hero h1 { font-size: 26px; margin-bottom: 8px; }
+.lede { font-size: 16px; margin: 0 0 8px; max-width: 80ch; }
+
 /* metric cards */
 .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 16px 0; }
 .cards .stat {
@@ -207,3 +212,11 @@ section.charts .card { margin-bottom: 0; }
 .merge-form select {
   border: 1px solid var(--line); border-radius: 8px; padding: 7px 9px; font: inherit; max-width: 260px;
 }
+
+/* usability: hover hints (title attribute) and help page bits */
+.tip { border-bottom: 1px dotted #b6c0d4; cursor: help; }
+.tip:hover { border-bottom-color: var(--accent); }
+ul.tips { padding-left: 18px; margin: 6px 0 0; }
+ul.tips li { margin: 4px 0; }
+a.chip { color: #33415c; }
+a.chip:hover { text-decoration: none; border-color: #c3cee8; background: #e6ecfa; }

@@ -61,7 +61,8 @@ and deleted independently.
 - **Visualisation**: activity-over-time chart (churn/growth/commits per
   week), top-authors donut, most-changed-files bars, per-object drill-down.
 - **Quality of life**: file search, sortable columns, pagination, CSV export,
-  persistent filter links, quick ranges, breadcrumb navigation.
+  persistent filter links, quick ranges, breadcrumb navigation, and a built-in
+  **Help & glossary page** (`/help`) that explains every number in plain English.
 
 ## Metric semantics
 
@@ -83,7 +84,7 @@ Builds synthetic repositories with deterministic dates and asserts exact
 metric values (renames, binary files, deletions, merges, mailmap, manual
 author merging, time ranges, manual commit sets, alternate refs), exercises
 zip ingestion through the real upload endpoint, and smoke-tests every HTTP
-route. Prints `All 62 checks passed.` when everything is correct.
+route. Prints `All 63 checks passed.` when everything is correct.
 
 ## Notes
 

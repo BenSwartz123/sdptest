@@ -1,40 +1,70 @@
 {% extends "base.html" %}
-{% block title %}Repositories{% endblock %}
+{% block title %}Home{% endblock %}
 {% block body %}
-<h1>Repositories</h1>
-<p class="lede">Analyse Git repositories as a dashboard: upload a zip of a repository
-(including its <code>.git</code> directory) or deep-clone one from a URL. Metrics are computed
-per commit set and can be filtered by author, file/directory and reference commit.</p>
+<section class="card hero">
+  <h1>RAT - Repository Analysis Tool</h1>
+  <p class="lede">Point RAT at a Git repository and it shows <b>who changed what, when and by
+  how much</b>. Every figure is computed from Git's own history and explained in plain English -
+  no Git knowledge needed. Add several repositories and compare them side by side.</p>
+  <p class="hint">New here? The <a href="{{ url_for('help_page') }}">Help &amp; glossary</a>
+  explains every term, number and chart in this tool.</p>
+</section>
 
-<div class="grid" id="add">
+<section class="grid">
+  <div class="card">
+    <h2>Five views, one story</h2>
+    <p class="hint"><b>Overview</b> shows the big picture: totals, activity over time and top
+    contributors. <b>Files</b> ranks every changed file. <b>Directories</b> lets you browse folder
+    by folder. <b>Commits</b> shows the raw history, and <b>Authors</b> shows who did what.</p>
+  </div>
+  <div class="card">
+    <h2>Numbers you can trust</h2>
+    <p class="hint">Line counts come from Git's own diff machinery: rename detection, binary
+    files excluded and merge commits handled exactly as the COMS3011A definitions require.</p>
+  </div>
+  <div class="card">
+    <h2>Slice it your way</h2>
+    <p class="hint">Filter by date range or a single author, hand-pick commits into custom sets,
+    merge duplicate identities, and export any table to CSV.</p>
+  </div>
+</section>
+
+<h2 class="mt" id="add">1. Add a repository</h2>
+<div class="grid">
   <section class="card">
-    <h2>Clone from URL</h2>
+    <h2>1a. Clone from URL <span class="hint">public repositories</span></h2>
     <form method="post" action="{{ url_for('clone_repo') }}">
       <input type="url" name="url" placeholder="https://github.com/DaveGamble/cJSON.git" required>
       <button class="btn" type="submit">Clone &amp; index</button>
     </form>
-    <p class="hint">A full (deep) mirror clone is made, so the complete history is analysed.</p>
+    <p class="hint">Paste the full web address of a public repository (GitHub, GitLab...).
+    The complete history is downloaded, so large projects can take a few minutes - indexing runs
+    in the background. Private repositories won't work: the tool never logs in.</p>
   </section>
   <section class="card">
-    <h2>Upload zip</h2>
+    <h2>1b. Upload zip <span class="hint">made from a clone</span></h2>
     <form method="post" action="{{ url_for('upload_repo') }}" enctype="multipart/form-data">
       <input type="file" name="zipfile" accept=".zip,application/zip" required>
       <button class="btn" type="submit">Upload &amp; index</button>
     </form>
-    <p class="hint">The archive must contain the repository's <code>.git</code> data (or be a bare repository).</p>
+    <p class="hint">The zip must contain the repository's hidden <code>.git</code> folder
+    (that's where the history lives). <b>Heads-up:</b> GitHub's green <i>Download ZIP</i> button does
+    <b>not</b> include it - <a href="{{ url_for('help_page') }}#fix">see the Help page</a> for the
+    working way to make a zip.</p>
   </section>
 </div>
 
-<h2 class="mt">All repositories</h2>
+<h2 class="mt">2. Open a dashboard</h2>
 {% if not repos %}
-<p class="empty">No repositories yet — add one above.</p>
+<p class="empty">No repositories yet - add one above and it will appear here.</p>
 {% endif %}
 <div class="grid">
   {% for r in repos %}
   <section class="card repo-card">
     <div class="row">
       <h3><a href="{{ url_for('overview', repo_id=r.id) }}">{{ r.name }}</a></h3>
-      <span class="badge {{ r.status }}">{{ r.status }}</span>
+      <span class="badge {{ r.status }}"
+            title="{{ 'Indexed and ready to explore' if r.status == 'ready' else ('Importing in the background - click View progress' if r.status != 'error' else 'Something went wrong - click Details to see why') }}">{{ r.status }}</span>
     </div>
     <p class="hint">{{ 'URL' if r.source_type == 'url' else 'Zip' }}: <span class="mono">{{ r.source }}</span></p>
     {% if r.status == 'ready' %}

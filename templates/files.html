@@ -5,7 +5,8 @@
 
 <div class="page-head">
   <h1>File metrics</h1>
-  <span class="hint">per-file metrics over the commit set ({{ total|num }} files with changes)</span>
+  <span class="hint">{{ total|num }} files changed in the commit set - click a column header to sort,
+  click a path for the file's own page</span>
   <a class="btn ghost small" href="{{ url_for('files_csv', repo_id=repo.id) }}?{{ q(over={'page': ''}) }}">Export CSV</a>
 </div>
 
@@ -22,26 +23,26 @@
 </form>
 
 <section class="cards small">
-  <div class="stat"><span class="k">Totals over set</span></div>
-  <div class="stat"><span class="k">Added</span><span class="v pos">+{{ totals.add|num }}</span></div>
-  <div class="stat"><span class="k">Removed</span><span class="v neg">−{{ totals.rem|num }}</span></div>
-  <div class="stat"><span class="k">Growth</span><span class="v">{{ totals.growth|num }}</span></div>
-  <div class="stat"><span class="k">Churn</span><span class="v">{{ totals.churn|num }}</span></div>
-  <div class="stat"><span class="k">Modifications</span><span class="v">{{ totals.mods|num }}</span></div>
+  <div class="stat"><span class="k tip" title="How many commits the totals below are based on (the commit set H).">Commits in set</span><span class="v">{{ size|num }}</span></div>
+  <div class="stat"><span class="k tip" title="Total lines added across all files.">Added</span><span class="v pos">+{{ totals.add|num }}</span></div>
+  <div class="stat"><span class="k tip" title="Total lines removed across all files.">Removed</span><span class="v neg">−{{ totals.rem|num }}</span></div>
+  <div class="stat"><span class="k tip" title="Added minus removed.">Growth</span><span class="v">{{ totals.growth|num }}</span></div>
+  <div class="stat"><span class="k tip" title="Added plus removed: total amount of change.">Churn</span><span class="v">{{ totals.churn|num }}</span></div>
+  <div class="stat"><span class="k tip" title="Commits that changed at least one file (a pure rename doesn't count).">Modifications</span><span class="v">{{ totals.mods|num }}</span></div>
 </section>
 
 <section class="card">
 <table class="tbl sortable">
   <thead>
     <tr>
-      <th><a href="{{ request.path }}?{{ q(over={'sort': 'path', 'page': ''}) }}">Path</a></th>
-      <th class="n"><a href="{{ request.path }}?{{ q(over={'sort': 'add', 'page': ''}) }}">Added</a></th>
-      <th class="n"><a href="{{ request.path }}?{{ q(over={'sort': 'rem', 'page': ''}) }}">Removed</a></th>
-      <th class="n"><a href="{{ request.path }}?{{ q(over={'sort': 'growth', 'page': ''}) }}">Growth</a></th>
-      <th class="n"><a href="{{ request.path }}?{{ q(over={'sort': 'churn', 'page': ''}) }}">Churn</a></th>
-      <th class="n"><a href="{{ request.path }}?{{ q(over={'sort': 'mods', 'page': ''}) }}">Mods</a></th>
-      <th class="n">Mod freq</th>
-      <th class="n">Churn rate</th>
+      <th><a href="{{ request.path }}?{{ q(over={'sort': 'path', 'page': ''}) }}" title="File path (click to sort A-Z)">Path</a></th>
+      <th class="n"><a href="{{ request.path }}?{{ q(over={'sort': 'add', 'page': ''}) }}" title="Lines added (+) - click to sort">Added</a></th>
+      <th class="n"><a href="{{ request.path }}?{{ q(over={'sort': 'rem', 'page': ''}) }}" title="Lines removed (−) - click to sort">Removed</a></th>
+      <th class="n"><a href="{{ request.path }}?{{ q(over={'sort': 'growth', 'page': ''}) }}" title="Added − removed - click to sort">Growth</a></th>
+      <th class="n"><a href="{{ request.path }}?{{ q(over={'sort': 'churn', 'page': ''}) }}" title="Added + removed: total amount of change - click to sort">Churn</a></th>
+      <th class="n"><a href="{{ request.path }}?{{ q(over={'sort': 'mods', 'page': ''}) }}" title="How many commits changed this file - click to sort">Mods</a></th>
+      <th class="n" title="Modifications divided by the number of commits in the set (how often the file changes).">Mod freq</th>
+      <th class="n" title="Churn divided by the number of commits in the set (average change per commit).">Churn rate</th>
     </tr>
   </thead>
   <tbody>

@@ -322,7 +322,7 @@ def main():
     check("zip ingest indexed commits", z_commits, 2)
 
     # --- dashboard smoke tests (HTTP 200 for every route) ----------------
-    for url in ("/", "/r/%d/" % rid, "/r/%d/files" % rid, "/r/%d/dir/" % rid,
+    for url in ("/", "/help", "/r/%d/" % rid, "/r/%d/files" % rid, "/r/%d/dir/" % rid,
                 "/r/%d/dir/sub" % rid, "/r/%d/file/sub/inner.txt" % rid,
                 "/r/%d/commits" % rid, "/r/%d/authors" % rid,
                 "/r/%d/status.json" % rid, "/r/%d/files.csv" % rid):

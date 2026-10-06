@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+{% block title %}Help &amp; glossary{% endblock %}
+{% block body %}
+<div class="page-head">
+  <h1>Help &amp; glossary</h1>
+  <span class="hint">Plain English - no Git knowledge needed. Hover any dotted label on the dashboard to see these explanations inline.</span>
+</div>
+
+<div class="setbar">
+  <a class="chip" href="#what">What is this tool?</a>
+  <a class="chip" href="#add">Adding a repository</a>
+  <a class="chip" href="#tabs">The five tabs</a>
+  <a class="chip" href="#numbers">What the numbers mean</a>
+  <a class="chip" href="#filters">Filtering &amp; commit sets</a>
+  <a class="chip" href="#tasks">Common tasks</a>
+  <a class="chip" href="#fix">If something goes wrong</a>
+</div>
+
+<section class="card" id="what">
+  <h2>What is this tool?</h2>
+  <p>
+    RAT looks inside a <b>Git repository</b> - the version-controlled folder where a software
+    project lives - and shows <b>who changed what, when, and by how much</b>. Every number
+    comes from Git's own history, so the figures match what Git itself reports.
+  </p>
+  <p>
+    You add a repository once; it is indexed in the background and then you can explore it
+    through five tabs. All numbers are computed over the <b>commit set</b> - a chosen group
+    of commits - which by default means the whole history.
+  </p>
+</section>
+
+<section class="card" id="add">
+  <h2>Adding a repository</h2>
+  <p>There are two ways, both on the <a href="{{ url_for('index') }}#add">home page</a>:</p>
+  <table class="tbl">
+    <thead><tr><th>Way</th><th>How</th><th>Good to know</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><b>Clone from URL</b></td>
+        <td>Paste the web address of a <b>public</b> repository (GitHub, GitLab, Bitbucket...) and press
+            Clone &amp; index.</td>
+        <td>The complete history is downloaded, so big projects can take a few minutes.
+            Private repositories won't work - the tool never logs in anywhere.</td>
+      </tr>
+      <tr>
+        <td><b>Upload a zip</b></td>
+        <td>Upload a <code>.zip</code> of a repository folder that <b>includes its hidden
+            <code>.git</code> folder</b>.</td>
+        <td>GitHub's green <b>Download ZIP</b> button does <u>not</u> include the history, so those
+            zips cannot be analysed. To make a working zip: clone the repository on your computer,
+            then zip the whole cloned folder (hidden files included) -
+            see <a href="#fix">If something goes wrong</a>.</td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="hint">Indexing runs in the background on a progress page; you can leave it open or come
+     back later - the repository stays listed on the home page either way.</p>
+</section>
+
+<section class="card" id="tabs">
+  <h2>The five tabs</h2>
+  <table class="tbl">
+    <thead><tr><th>Tab</th><th>What it shows</th><th>Use it to...</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><b>Overview</b></td>
+        <td>The big picture: key totals, activity over time, the most-changed files and the
+            top authors - all for the current commit set.</td>
+        <td>Get oriented. This is the page to show someone who has never seen the repository.</td>
+      </tr>
+      <tr>
+        <td><b>Files</b></td>
+        <td>Every file that changed, one row each, with a column per metric. Search by path,
+            click a column header to sort, export everything to a spreadsheet.</td>
+        <td>Find the busiest or biggest files, or the files only one person touches.</td>
+      </tr>
+      <tr>
+        <td><b>Directories</b></td>
+        <td>The same metrics but organised like folders. Each folder's numbers include
+            everything inside it, at any depth.</td>
+        <td>Explore a project structure folder by folder.</td>
+      </tr>
+      <tr>
+        <td><b>Commits</b></td>
+        <td>The raw list of commits, newest first, with a search box.</td>
+        <td>See the actual history - and tick commits to build a custom commit set.</td>
+      </tr>
+      <tr>
+        <td><b>Authors</b></td>
+        <td>Who did what: commits, lines added/removed, churn and ownership per person.</td>
+        <td>See each person's contribution - and merge duplicate names or emails.</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="card" id="numbers">
+  <h2>What the numbers mean</h2>
+  <table class="tbl">
+    <thead><tr><th>Term</th><th>In plain English</th></tr></thead>
+    <tbody>
+      <tr><td class="tip" title="The commits all numbers on the dashboard are based on."><b>Commit set</b> (H)</td>
+          <td>The group of commits the numbers are computed from. By default: all history.
+              You can narrow it with the filter bar or by hand-picking commits.</td></tr>
+      <tr><td class="tip" title="Usually the newest commit."><b>Reference</b></td>
+          <td>The point in history to count from - normally the latest commit (<code>HEAD</code>).
+              Change it to measure from an older point, a branch or a tag.</td></tr>
+      <tr><td class="tip" title="Size of the commit set: how many commits are counted."><b>|H|</b></td>
+          <td>How many commits are in the current commit set. "Per commit" figures divide by this.</td></tr>
+      <tr><td class="tip" title="Counted by Git itself; binary files such as images are ignored."><b>Added</b> / <b>Removed</b></td>
+          <td>How many lines the commits added and deleted, counted by Git's diff. Binary files
+              (images, PDFs...) are skipped, and pure renames are followed to the new name.</td></tr>
+      <tr><td class="tip" title="Added minus removed. Negative means the project shrank."><b>Growth</b> (Δ)</td>
+          <td>Added minus removed. Positive: the codebase grew by that many lines. Negative: it shrank.</td></tr>
+      <tr><td class="tip" title="Added plus removed: total amount of change."><b>Churn</b> (λ)</td>
+          <td>Added plus removed - the total amount of change. A file edited many times has high churn
+              even if it never grows.</td></tr>
+      <tr><td class="tip" title="How many commits in the set changed this file."><b>Modifications</b> (n)</td>
+          <td>How many of the commits in the set actually changed this file. A pure rename doesn't
+              count as a modification.</td></tr>
+      <tr><td class="tip" title="Modifications divided by the number of commits in the set."><b>Mod frequency</b> (η)</td>
+          <td>Modifications divided by |H| - the fraction of commits that touched the file.
+              0.10 means one in ten commits changed it.</td></tr>
+      <tr><td class="tip" title="Average amount of change per commit."><b>Churn rate</b> (ρ)</td>
+          <td>Churn divided by |H| - the average number of changed lines per commit in the set.</td></tr>
+      <tr><td class="tip" title="An author's share of all changed lines on the item."><b>Ownership</b> (ω)</td>
+          <td>An author's share of all changed lines on the file or folder, as a percentage.
+              Answers "who knows this code best?"</td></tr>
+      <tr><td class="tip" title="Git identifies people by name + email, so one person can appear twice."><b>Author identity</b></td>
+          <td>Git recognises people by <i>name + email</i>, so one person with two emails looks like two
+              authors. The tool merges them automatically using the project's <code>.mailmap</code>
+              file, and you can merge more by hand on the Authors tab.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="card" id="filters">
+  <h2>Filtering &amp; commit sets</h2>
+  <p>The bar at the top of every dashboard page decides <b>what gets counted</b>:</p>
+  <table class="tbl">
+    <thead><tr><th>Control</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td><b>Reference</b></td>
+          <td>Count history from this commit. Leave it as <code>HEAD</code> (the latest) unless
+              you deliberately want an older point.</td></tr>
+      <tr><td><b>From / To</b></td>
+          <td>Only count commits inside this date range (<b>To</b> itself is not included).
+              The quick buttons "30 days", "90 days" and "1 year" fill this in for you.</td></tr>
+      <tr><td><b>Author</b></td>
+          <td>Only one person's commits - applied everywhere on the repository until you clear it.</td></tr>
+      <tr><td><b>Clear</b></td>
+          <td>Removes all filters and goes back to "all history, everyone".</td></tr>
+      <tr><td><b>Manual commit set</b></td>
+          <td>On the <b>Commits</b> tab, tick individual commits and press
+              "Apply checked commits" - every tab then shows only those commits. The orange chip
+              at the top shows when a manual set is active, with a link to edit it.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="card" id="tasks">
+  <h2>Common tasks</h2>
+  <table class="tbl">
+    <thead><tr><th>I want to...</th><th>Do this</th></tr></thead>
+    <tbody>
+      <tr><td>See who contributed the most</td>
+          <td>Open <b>Overview</b> and look at the Authors table, or the <b>Authors</b> tab for the
+              full breakdown.</td></tr>
+      <tr><td>See only the last 30 days</td>
+          <td>Click the <b>30 days</b> button in the filter bar, then <b>Apply</b>.</td></tr>
+      <tr><td>Find the files that change the most</td>
+          <td><b>Files</b> tab, then click the <b>Churn</b> or <b>Mods</b> column header to sort.</td></tr>
+      <tr><td>Focus on one person</td>
+          <td>Pick them in the <b>Author</b> dropdown, then <b>Apply</b>.</td></tr>
+      <tr><td>Fix one person appearing twice</td>
+          <td><b>Authors</b> tab &rarr; <b>Merge authors</b>: choose the two identities and press
+              Merge. It can be undone.</td></tr>
+      <tr><td>Get the data into Excel</td>
+          <td>Press <b>Export CSV</b> on the Overview or Files tab - it downloads the current
+              (filtered) numbers.</td></tr>
+      <tr><td>Look at one part of the project</td>
+          <td><b>Directories</b> tab, then click through the folders.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="card" id="fix">
+  <h2>If something goes wrong</h2>
+  <table class="tbl">
+    <thead><tr><th>What you see</th><th>What it means and what to do</th></tr></thead>
+    <tbody>
+      <tr><td>"no git repository found" when uploading a zip</td>
+          <td>The zip has no Git history inside. This almost always means it came from GitHub's
+              green <b>Download ZIP</b> button, which only includes the current files.
+              Fix: clone the repository by URL instead, or zip a local clone (hidden
+              <code>.git</code> folder included).</td></tr>
+      <tr><td>Clone fails or times out</td>
+          <td>Check the URL is the full address of a <b>public</b> repository. Private repositories
+              can't be reached because the tool never logs in. Big projects simply take a while.</td></tr>
+      <tr><td>A repository is stuck on "working"</td>
+          <td>Large histories take minutes. The progress page updates by itself - you can leave and
+              come back; indexing continues in the background.</td></tr>
+      <tr><td>Everything shows zero</td>
+          <td>Your filters probably exclude everything - for example a date range in the future, or
+              an author with no commits in the range. Press <b>Clear</b> in the filter bar.</td></tr>
+    </tbody>
+  </table>
+</section>
+{% endblock %}

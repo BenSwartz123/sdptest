@@ -188,6 +188,12 @@ def index():
     return render_template("repos.html", repos=db.list_repos(g.conn))
 
 
+@app.route("/help")
+def help_page():
+    """Plain-English guide and glossary for non-technical readers."""
+    return render_template("help.html", repos=db.list_repos(g.conn))
+
+
 @app.route("/repos/clone", methods=["POST"])
 def clone_repo():
     url = (request.form.get("url") or "").strip()

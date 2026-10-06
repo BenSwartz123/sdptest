@@ -4,22 +4,23 @@
   <input type="hidden" name="sort" value="{{ request.args.get('sort', '') }}">
 
   <div class="fgroup">
-    <label for="flt-ref">Reference</label>
-    <input id="flt-ref" name="ref" list="ref-list" value="{{ current_ref }}" spellcheck="false" autocomplete="off">
+    <label for="flt-ref" class="tip" title="The point in history to count from - leave as HEAD (= the latest commit).">Reference</label>
+    <input id="flt-ref" name="ref" list="ref-list" value="{{ current_ref }}" spellcheck="false" autocomplete="off"
+           title="The point in history to count from - leave as HEAD (= the latest commit).">
     <datalist id="ref-list">
       {% for r in refs %}<option value="{{ r }}"></option>{% endfor %}
     </datalist>
   </div>
 
   <div class="fgroup">
-    <label for="flt-from">From</label>
+    <label for="flt-from" class="tip" title="Only count commits made on or after this date/time.">From</label>
     <input id="flt-from" type="datetime-local" name="from" value="{{ request.args.get('from', '') }}">
-    <label for="flt-to">To <span class="hint">(exclusive)</span></label>
+    <label for="flt-to" class="tip" title="Only count commits made before this date/time (the moment itself is not included).">To <span class="hint">(exclusive)</span></label>
     <input id="flt-to" type="datetime-local" name="to" value="{{ request.args.get('to', '') }}">
   </div>
 
   <div class="fgroup">
-    <label for="flt-author">Author</label>
+    <label for="flt-author" class="tip" title="Count only this one person's commits - everywhere on the dashboard.">Author</label>
     <select id="flt-author" name="author">
       <option value="">All authors</option>
       {% for a in authors_list %}
@@ -38,10 +39,11 @@
 </form>
 
 <div class="setbar">
-  <span class="chip">Commit set: {{ f.describe() }}</span>
-  <span class="chip">|H| = <b>{{ size|num }}</b> commits</span>
+  <span class="chip tip" title="The commit set (H) is the group of commits every number on this dashboard is based on. Change it with the filters above or on the Commits tab.">Commit set: {{ f.describe() }}</span>
+  <span class="chip tip" title="|H| = how many commits are in the current commit set. Per-commit figures divide by this number.">|H| = <b>{{ size|num }}</b> commits</span>
   {% if f.mode == 'manual' %}
   <span class="chip accent">Manual selection active ({{ f.manual_ids|length }} commits)
     <a href="{{ url_for('commits', repo_id=repo.id) }}?{{ q(over={'sel': ''}) }}">edit</a></span>
   {% endif %}
+  <a class="chip" href="{{ url_for('help_page') }}#numbers" title="Open the Help page for plain-English explanations of every number">? What do these mean?</a>
 </div>
